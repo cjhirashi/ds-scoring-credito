@@ -184,5 +184,5 @@ El modelo discrimina mal pagador de buen pagador con ROC-AUC ~0.81, pero con pre
 ## 👨‍💻 Autor
 
 **Carlos Jiménez Hirashi**
-💼 Data Scientist Jr. | Python & Machine Learning
+💼 Data Scientist & Intelligent Automation Architect
 📧 [cjhirashi@gmail.com](mailto:cjhirashi@gmail.com) · 🌐 [LinkedIn](https://www.linkedin.com/in/cjhirashi)
