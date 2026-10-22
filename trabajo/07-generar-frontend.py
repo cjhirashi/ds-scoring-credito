@@ -28,8 +28,13 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 
 def layout_base(fig, titulo, height=440):
+    # height queda como "alto de referencia" (usado por el contenedor CSS vía
+    # aspect-ratio, no fijado aquí) — autosize:True deja que Plotly llene ese
+    # contenedor en vez de imponer un ancho/alto fijo que se ve mal en móvil.
     fig.update_layout(title=titulo, paper_bgcolor=BG, plot_bgcolor=BG,
-                       font=dict(size=13), margin=dict(l=55, r=25, t=50, b=45), height=height)
+                       font=dict(size=13), margin=dict(l=50, r=20, t=50, b=40),
+                       autosize=True)
+    fig._alto_ref = height
     return fig
 
 # Gráficas (mismo contenido que 06-graficas-interactivas.py)
@@ -54,14 +59,14 @@ fig2 = go.Figure()
 fig2.add_trace(go.Scatter(x=fpr, y=tpr, mode="lines", name=f"Random Forest (AUC={auc:.3f})",
                            line=dict(color=AZUL, width=3), fill="tozeroy", fillcolor="rgba(6,182,212,0.15)"))
 fig2.add_trace(go.Scatter(x=[0, 1], y=[0, 1], mode="lines", name="Azar (AUC=0.5)", line=dict(color="gray", dash="dash")))
-fig2 = layout_base(fig2, "Curva ROC — modelo final en test")
+fig2 = layout_base(fig2, "Curva ROC — modelo final en test", height=620)
 fig2.update_layout(xaxis_title="Tasa de falsos positivos", yaxis_title="Tasa de verdaderos positivos")
 
 cm = confusion_matrix(y_test, pred_test)
 etiquetas = ["Buen pagador", "Mal pagador"]
 fig3 = go.Figure(go.Heatmap(z=cm, x=etiquetas, y=etiquetas, colorscale="Teal",
                              text=cm, texttemplate="%{text}", textfont=dict(size=18), showscale=False))
-fig3 = layout_base(fig3, "Matriz de confusión — test")
+fig3 = layout_base(fig3, "Matriz de confusión — test", height=560)
 fig3.update_layout(xaxis_title="Predicción", yaxis_title="Real", yaxis=dict(autorange="reversed"))
 
 nombres_cat = pipe.named_steps["prep"].named_transformers_["cat"].get_feature_names_out(cat_cols)
@@ -86,8 +91,16 @@ graficas = [
 ]
 html_graficas = []
 for fig, titulo, descripcion in graficas:
-    bloque = pio.to_html(fig, include_plotlyjs=False, full_html=False, config={"displayModeBar": True, "displaylogo": False})
-    html_graficas.append(f'<section class="panel card"><h2>{titulo}</h2><p class="descripcion">{descripcion}</p>{bloque}</section>')
+    ancho_ref = 980
+    bloque = pio.to_html(
+        fig, include_plotlyjs=False, full_html=False,
+        default_width="100%", default_height="100%",
+        config={"displayModeBar": True, "displaylogo": False, "responsive": True},
+    )
+    html_graficas.append(
+        f'<section class="panel card"><h2>{titulo}</h2><p class="descripcion">{descripcion}</p>'
+        f'<div class="plot-wrap" style="aspect-ratio:{ancho_ref}/{fig._alto_ref};">{bloque}</div></section>'
+    )
 
 kpis = [
     ("ROC-AUC (test)", f"{auc:.3f}", "Capacidad de separar mal pagador de buen pagador. 0.5=azar, 1.0=perfecto.", AZUL),
@@ -254,6 +267,19 @@ pagina = f"""<!DOCTYPE html>
   /* Panels */
   .panel {{ padding: 28px 28px 12px; margin-bottom: 24px; }}
   .descripcion {{ color: var(--text-secondary); font-size: 0.95rem; margin: 0 0 18px; max-width: 760px; }}
+
+  /* Gráficas Plotly — responsivas: el wrapper fija la proporción con
+     aspect-ratio, Plotly llena ese contenedor (config responsive:true)
+     en vez de imponer un ancho/alto fijo en px que se ve mal en móvil. */
+  .plot-wrap {{ width: 100%; position: relative; }}
+  .plot-wrap .plotly-graph-div {{ width: 100% !important; height: 100% !important; position: absolute; inset: 0; }}
+
+  @media (max-width: 640px) {{
+    .wrap {{ padding: 0 14px 60px; }}
+    .hero {{ padding: 48px 0 28px; }}
+    .panel {{ padding: 18px 16px 10px; }}
+    .modebar-container {{ display: none !important; }}
+  }}
 
   /* Formulario — mismo tratamiento que .input-field */
   .form-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; padding-bottom: 20px; }}
