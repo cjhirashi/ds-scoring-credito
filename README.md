@@ -11,6 +11,8 @@
 
 Proyecto propio de portafolio. Desarrollo de un modelo de **Machine Learning** para predecir si un solicitante de tarjeta de crédito se convertirá en **mal pagador** (atraso ≥60 días en su historial de pagos), usando el dataset de Kaggle [`rikdifos/credit-card-approval-prediction`](https://www.kaggle.com/datasets/rikdifos/credit-card-approval-prediction).
 
+Accede al Notebook: [notebooks/analisis_scoring_crediticio.ipynb](https://github.com/cjhirashi/ds-scoring-credito/blob/main/notebooks/analisis_scoring_crediticio.ipynb) — con el análisis narrado paso a paso y las gráficas del resultado.
+
 ---
 
 ## ✨ Objetivos principales
@@ -57,6 +59,11 @@ El análisis se llevó a cabo en scripts numerados dentro de `trabajo/`, cada un
    - `GridSearchCV` con validación cruzada estratificada de 5 folds sobre el modelo ganador (Random Forest).
    - Evaluación del mejor modelo en el conjunto de prueba, nunca visto durante el ajuste.
 
+5. **`05-figuras.py` — Generación de gráficas**
+   - Distribución de la etiqueta, curva ROC, matriz de confusión e importancia de variables.
+
+El notebook **`notebooks/analisis_scoring_crediticio.ipynb`** consolida los cuatro pasos anteriores con narrativa y las gráficas inline.
+
 ---
 
 ## ⚙️ Estructura del proyecto
@@ -70,12 +77,16 @@ El análisis se llevó a cabo en scripts numerados dentro de `trabajo/`, cada un
 │   ├── 01-eda.py
 │   ├── 02-limpieza.py
 │   ├── 03-modelo.py
-│   └── 04-seleccion.py
+│   ├── 04-seleccion.py
+│   └── 05-figuras.py
+├── notebooks/
+│   └── analisis_scoring_crediticio.ipynb
 ├── resultados/
 │   ├── etiqueta_riesgo.csv
 │   ├── dataset_limpio.csv
 │   ├── comparacion_modelos.csv
-│   └── modelo_final.csv
+│   ├── modelo_final.csv
+│   └── fig_01..04_*.png
 ├── .gitignore
 └── README.md
 ```
