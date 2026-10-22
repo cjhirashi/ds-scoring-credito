@@ -1,0 +1,2 @@
+mejores_params,roc_auc_cv_train,roc_auc_test,f1_test,precision_test,recall_test
+"{'clf__max_depth': None, 'clf__min_samples_leaf': 1, 'clf__n_estimators': 400}",0.7993,0.8144,0.2439,0.1829,0.3659
