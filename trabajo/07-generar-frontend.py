@@ -281,11 +281,21 @@ pagina = f"""<!DOCTYPE html>
 
   .mono {{ font-family: var(--mono); }}
 
+  /* Footer — misma estructura que cjhirashi-career-portfolio (Footer.tsx): copyright + iconos sociales */
   footer {{
-    color: var(--text-muted); font-size: 0.85rem; margin-top: 40px; padding-top: 24px;
-    border-top: 1px solid var(--border-glass); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+    color: var(--text-secondary); margin-top: 48px; border-top: 1px solid var(--border-glass);
   }}
-  footer .mono {{ font-family: var(--mono); }}
+  .footer-row {{
+    padding: 28px 0 8px;
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px;
+  }}
+  .footer-row p {{ font-size: 0.85rem; margin: 0; }}
+  .footer-social {{ display: flex; align-items: center; gap: 20px; }}
+  .footer-social a {{ color: var(--text-secondary); display: inline-flex; transition: color 150ms ease; }}
+  .footer-social a:hover {{ color: var(--primary-color); text-decoration: none; }}
+  .footer-back {{ font-size: 0.85rem; color: var(--text-secondary) !important; }}
+  .footer-back:hover {{ color: var(--primary-color) !important; }}
+  .footer-stack {{ padding: 0 0 24px; font-size: 0.78rem; color: var(--text-muted); }}
 </style>
 </head>
 <body>
@@ -309,8 +319,27 @@ pagina = f"""<!DOCTYPE html>
   <div id="predecir">{form_html}</div>
 
   <footer>
-    <span>Carlos Jiménez Hirashi — Data Scientist &amp; Intelligent Automation Architect</span>
-    <span class="mono">Random Forest + scikit-learn · FastAPI · Plotly · Dataset: Kaggle rikdifos/credit-card-approval-prediction</span>
+    <div class="footer-row">
+      <div>
+        <p>© 2026 Carlos A. Jiménez Hirashi</p>
+        <a class="footer-back" href="https://cjhirashi.com/projects/prj-47" target="_blank" rel="noopener noreferrer">← Volver al proyecto en el portafolio</a>
+      </div>
+      <div class="footer-social">
+        <a href="https://github.com/cjhirashi" target="_blank" rel="noopener noreferrer" aria-label="GitHub" title="GitHub">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.73.5.5 5.73.5 12c0 5.08 3.29 9.39 7.86 10.91.58.1.79-.25.79-.56 0-.27-.01-1-.02-1.97-3.2.7-3.88-1.54-3.88-1.54-.52-1.33-1.28-1.69-1.28-1.69-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.24 3.33.95.1-.74.4-1.24.72-1.53-2.55-.29-5.23-1.28-5.23-5.68 0-1.26.45-2.29 1.18-3.09-.12-.29-.51-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.24 2.76.12 3.05.74.8 1.18 1.83 1.18 3.09 0 4.41-2.69 5.39-5.25 5.67.41.36.78 1.07.78 2.15 0 1.56-.01 2.81-.01 3.19 0 .31.21.67.8.56A10.52 10.52 0 0 0 23.5 12C23.5 5.73 18.27.5 12 .5Z"/></svg>
+        </a>
+        <a href="https://www.linkedin.com/in/cjhirashi" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" title="LinkedIn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.34V9h3.42v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.07 2.07 0 1 1 0-4.13 2.07 2.07 0 0 1 0 4.13ZM7.12 20.45H3.56V9h3.56v11.45ZM22.22 0H1.77C.8 0 0 .78 0 1.75v20.5C0 23.22.8 24 1.77 24h20.45c.98 0 1.78-.78 1.78-1.75V1.75C24 .78 23.2 0 22.22 0Z"/></svg>
+        </a>
+        <a href="mailto:carlos@cjhirashi.com" aria-label="Email" title="Email">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 7L2 7"/></svg>
+        </a>
+        <a href="https://wa.me/525513710160" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" title="WhatsApp">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.868-2.03-.967-.273-.099-.47-.148-.669.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12.041 2C6.496 2 2 6.476 2 11.994c0 1.993.588 3.85 1.6 5.411L2 22l4.71-1.555a10.09 10.09 0 0 0 5.331 1.521h.004c5.545 0 10.04-4.476 10.042-9.994 0-2.67-1.04-5.179-2.93-7.064A10.013 10.013 0 0 0 12.041 2Zm0 18.168h-.003a8.157 8.157 0 0 1-4.168-1.14l-.299-.177-3.096 1.023.84-3.5-.199-.33a8.13 8.13 0 0 1-1.262-4.37c0-4.502 3.68-8.166 8.164-8.166a8.14 8.14 0 0 1 5.783 2.4 8.1 8.1 0 0 1 2.39 5.785c-.002 4.502-3.68 8.475-8.15 8.475Z"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="footer-stack mono">Random Forest + scikit-learn · FastAPI · Plotly · Dataset: Kaggle rikdifos/credit-card-approval-prediction</div>
   </footer>
 </div>
 <script>
