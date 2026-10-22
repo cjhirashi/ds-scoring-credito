@@ -1,1 +1,5 @@
 datos/
+__pycache__/
+*.pyc
+resultados/modelo_final.joblib
+

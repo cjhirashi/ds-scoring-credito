@@ -1,0 +1,11 @@
+services:
+  api:
+    build: .
+    container_name: ds-scoring-credito-api
+    restart: unless-stopped
+    networks:
+      - net-data-science
+
+networks:
+  net-data-science:
+    external: true

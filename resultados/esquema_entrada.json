@@ -1,0 +1,24 @@
+{
+  "num_cols": [
+    "CNT_CHILDREN",
+    "AMT_INCOME_TOTAL",
+    "FLAG_MOBIL",
+    "FLAG_WORK_PHONE",
+    "FLAG_PHONE",
+    "FLAG_EMAIL",
+    "CNT_FAM_MEMBERS",
+    "EDAD_ANIOS",
+    "DESEMPLEADO",
+    "ANIOS_EMPLEO"
+  ],
+  "cat_cols": [
+    "CODE_GENDER",
+    "FLAG_OWN_CAR",
+    "FLAG_OWN_REALTY",
+    "NAME_INCOME_TYPE",
+    "NAME_EDUCATION_TYPE",
+    "NAME_FAMILY_STATUS",
+    "NAME_HOUSING_TYPE",
+    "OCCUPATION_TYPE"
+  ]
+}

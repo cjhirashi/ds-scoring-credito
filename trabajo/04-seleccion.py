@@ -1,3 +1,5 @@
+import json
+import joblib
 import pandas as pd
 from sklearn.model_selection import train_test_split, GridSearchCV, StratifiedKFold
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
@@ -63,3 +65,15 @@ resumen = pd.DataFrame([{
     "recall_test": round(recall_score(y_test, pred_test), 4),
 }])
 resumen.to_csv(f"{RUTA_RES}/modelo_final.csv", index=False)
+
+# Modelo de producción: mismos hiperparámetros, reentrenado con TODOS los datos
+# (train+test) para aprovechar toda la señal disponible una vez ya evaluado el
+# desempeño honesto arriba. Las métricas reportadas siguen siendo las de test.
+modelo_produccion = busqueda.best_estimator_
+modelo_produccion.fit(X, y)
+joblib.dump(modelo_produccion, f"{RUTA_RES}/modelo_final.joblib")
+
+with open(f"{RUTA_RES}/esquema_entrada.json", "w") as f:
+    json.dump({"num_cols": num_cols, "cat_cols": cat_cols}, f, indent=2)
+
+print("\nmodelo de producción guardado en resultados/modelo_final.joblib")
