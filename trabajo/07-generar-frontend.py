@@ -10,7 +10,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import roc_curve, roc_auc_score, confusion_matrix
 
 pio.templates.default = "plotly_dark"
-BG = "#1e1e1e"
+BG = "#1a1e27"
 AZUL, ROJO, VERDE, NARANJA = "#4C9AFF", "#FF6B6B", "#5FD3A3", "#F5A623"
 
 RANDOM_STATE = 42
@@ -95,7 +95,7 @@ kpis = [
     ("Recall", "36.6%", "De cada 10 malos pagadores reales, detecta ~4.", VERDE),
     ("Precision", "18.3%", "De cada 10 alertas, ~2 son realmente mal pagador.", NARANJA),
 ]
-kpi_html = "".join(f'''<div class="kpi" style="border-top:3px solid {color}">
+kpi_html = "".join(f'''<div class="kpi" style="--kpi-color:{color}">
   <div class="kpi-valor" style="color:{color}">{valor}</div>
   <div class="kpi-label">{label}</div><div class="kpi-nota">{nota}</div></div>''' for label, valor, nota, color in kpis)
 
@@ -138,42 +138,126 @@ pagina = f"""<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Scoring Crediticio — Dashboard</title>
+<title>Scoring Crediticio — Carlos Jiménez Hirashi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 <style>
+  :root {{
+    --bg: #0f1115; --bg-elev: #161920; --card: #1a1e27; --card-hover: #1f2430;
+    --border: #272c38; --text: #e8eaf0; --text-dim: #9aa0b0; --text-faint: #686f82;
+    --azul: {AZUL}; --rojo: {ROJO}; --verde: {VERDE}; --naranja: {NARANJA};
+    --font: 'Inter', system-ui, sans-serif; --mono: 'JetBrains Mono', monospace;
+    --radius: 14px;
+  }}
   * {{ box-sizing: border-box; }}
-  body {{ background:{BG}; color:#eee; font-family: 'Segoe UI', system-ui, sans-serif; max-width: 980px; margin: 0 auto; padding: 30px 20px 60px; line-height: 1.5; }}
-  h1 {{ font-size: 1.7rem; margin-bottom: 4px; }}
-  h2 {{ font-size: 1.15rem; margin: 0 0 10px; color: #fff; }}
-  p.intro {{ color:#999; margin-top: 0; }}
-  .descripcion {{ color:#bbb; font-size: 0.95rem; margin-bottom: 14px; max-width: 760px; }}
-  .descripcion code {{ background:#2a2a2a; padding: 1px 5px; border-radius: 4px; font-size: 0.85em; }}
-  a {{ color:{AZUL}; }}
-  .kpis {{ display:grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; margin: 24px 0 36px; }}
-  .kpi {{ background:#262626; border-radius: 10px; padding: 16px 18px; }}
-  .kpi-valor {{ font-size: 1.8rem; font-weight: 700; }}
-  .kpi-label {{ font-size: 0.85rem; color:#ccc; margin-top: 2px; font-weight: 600; }}
-  .kpi-nota {{ font-size: 0.78rem; color:#888; margin-top: 6px; }}
-  .panel {{ background:#242424; border-radius: 12px; padding: 20px 24px 8px; margin-bottom: 28px; }}
-  .form-grid {{ display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; padding-bottom: 16px; }}
-  .form-grid label {{ display:flex; flex-direction:column; font-size:0.85rem; color:#ccc; gap:4px; }}
-  .form-grid label.checkbox {{ flex-direction:row; align-items:center; gap:8px; }}
-  .form-grid select, .form-grid input[type=number] {{ background:#1a1a1a; border:1px solid #444; color:#eee; border-radius:6px; padding:8px; }}
-  button {{ grid-column: 1 / -1; background:{AZUL}; color:#111; font-weight:700; border:none; border-radius:8px; padding:12px; cursor:pointer; font-size:1rem; }}
-  button:hover {{ opacity:0.9; }}
-  #resultado-prediccion {{ padding: 16px 0; font-size: 1rem; }}
-  .resultado-ok {{ color:{VERDE}; font-weight:700; }}
-  .resultado-riesgo {{ color:{ROJO}; font-weight:700; }}
-  footer {{ color:#666; font-size: 0.85rem; margin-top: 20px; }}
+  body {{
+    background: radial-gradient(ellipse 1200px 600px at 50% -10%, #1a2436 0%, var(--bg) 55%);
+    color: var(--text); font-family: var(--font); margin: 0; line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }}
+  .wrap {{ max-width: 1040px; margin: 0 auto; padding: 0 24px 80px; }}
+  a {{ color: var(--azul); text-decoration: none; }}
+  a:hover {{ text-decoration: underline; }}
+  code {{ font-family: var(--mono); background: #10131a; padding: 2px 6px; border-radius: 5px; font-size: 0.85em; border: 1px solid var(--border); }}
+
+  /* Hero */
+  .hero {{ padding: 72px 0 40px; text-align: left; }}
+  .badge {{
+    display: inline-flex; align-items: center; gap: 8px; background: rgba(76,154,255,0.1);
+    border: 1px solid rgba(76,154,255,0.3); color: var(--azul); font-size: 0.78rem;
+    font-weight: 600; padding: 6px 14px; border-radius: 999px; margin-bottom: 20px; letter-spacing: 0.02em;
+  }}
+  .badge::before {{ content: '●'; color: var(--verde); font-size: 0.6rem; }}
+  .hero h1 {{
+    font-size: clamp(2rem, 4.5vw, 2.9rem); font-weight: 800; letter-spacing: -0.02em;
+    margin: 0 0 16px; line-height: 1.12;
+    background: linear-gradient(135deg, #fff 30%, #aab4cc 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }}
+  .hero p.lead {{ font-size: 1.1rem; color: var(--text-dim); max-width: 640px; margin: 0 0 28px; }}
+  .hero .links {{ display: flex; gap: 12px; flex-wrap: wrap; }}
+  .btn {{
+    display: inline-flex; align-items: center; gap: 8px; padding: 11px 20px; border-radius: 10px;
+    font-weight: 600; font-size: 0.92rem; border: 1px solid var(--border); transition: all .15s ease;
+  }}
+  .btn:hover {{ text-decoration: none; transform: translateY(-1px); }}
+  .btn-primary {{ background: var(--azul); color: #0a0f1a; border-color: var(--azul); }}
+  .btn-primary:hover {{ box-shadow: 0 6px 20px rgba(76,154,255,0.35); }}
+  .btn-ghost {{ background: var(--card); color: var(--text); }}
+  .btn-ghost:hover {{ background: var(--card-hover); border-color: var(--text-faint); }}
+
+  h2 {{ font-size: 1.2rem; font-weight: 700; margin: 0 0 8px; color: #fff; letter-spacing: -0.01em; }}
+  .section-label {{ font-size: 0.78rem; font-weight: 700; color: var(--azul); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; }}
+
+  /* KPIs */
+  .kpis {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin: 8px 0 48px; }}
+  .kpi {{
+    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 20px 22px; position: relative; overflow: hidden; transition: border-color .15s ease;
+  }}
+  .kpi:hover {{ border-color: var(--text-faint); }}
+  .kpi::before {{ content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--kpi-color, var(--azul)); }}
+  .kpi-valor {{ font-size: 2rem; font-weight: 800; font-family: var(--mono); letter-spacing: -0.02em; }}
+  .kpi-label {{ font-size: 0.82rem; color: var(--text); margin-top: 4px; font-weight: 600; }}
+  .kpi-nota {{ font-size: 0.78rem; color: var(--text-faint); margin-top: 8px; line-height: 1.4; }}
+
+  /* Panels */
+  .panel {{
+    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 28px 28px 12px; margin-bottom: 24px;
+  }}
+  .descripcion {{ color: var(--text-dim); font-size: 0.95rem; margin: 0 0 18px; max-width: 760px; }}
+
+  /* Formulario */
+  .form-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; padding-bottom: 20px; }}
+  .form-grid label {{ display: flex; flex-direction: column; font-size: 0.82rem; color: var(--text-dim); gap: 6px; font-weight: 500; }}
+  .form-grid label.checkbox {{ flex-direction: row; align-items: center; gap: 10px; }}
+  .form-grid select, .form-grid input[type=number] {{
+    background: var(--bg-elev); border: 1px solid var(--border); color: var(--text);
+    border-radius: 8px; padding: 10px 12px; font-family: var(--font); font-size: 0.92rem; transition: border-color .15s ease;
+  }}
+  .form-grid select:focus, .form-grid input:focus {{ outline: none; border-color: var(--azul); }}
+  .form-grid input[type=checkbox] {{ width: 16px; height: 16px; accent-color: var(--azul); }}
+  button[type=submit] {{
+    grid-column: 1 / -1; background: linear-gradient(135deg, var(--azul), #3f7fd6); color: #0a0f1a;
+    font-weight: 700; border: none; border-radius: 10px; padding: 14px; cursor: pointer;
+    font-size: 0.98rem; margin-top: 4px; transition: all .15s ease;
+  }}
+  button[type=submit]:hover {{ box-shadow: 0 6px 24px rgba(76,154,255,0.35); transform: translateY(-1px); }}
+  #resultado-prediccion {{ padding: 18px 0 20px; font-size: 1rem; min-height: 1.2em; }}
+  .resultado-ok {{ color: var(--verde); font-weight: 700; }}
+  .resultado-riesgo {{ color: var(--rojo); font-weight: 700; }}
+
+  footer {{
+    color: var(--text-faint); font-size: 0.85rem; margin-top: 40px; padding-top: 24px;
+    border-top: 1px solid var(--border); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+  }}
 </style>
 </head>
 <body>
-<h1>Scoring Crediticio — Predicción de Riesgo de Impago</h1>
-<p class="intro">Dashboard interactivo + modelo en vivo. Repo: <a href="https://github.com/cjhirashi/ds-scoring-credito">github.com/cjhirashi/ds-scoring-credito</a></p>
-<div class="kpis">{kpi_html}</div>
-{''.join(html_graficas)}
-{form_html}
-<footer>Random Forest + scikit-learn, servido con FastAPI, visualizado con Plotly. Dataset: Kaggle <code>rikdifos/credit-card-approval-prediction</code>.</footer>
+<div class="wrap">
+  <section class="hero">
+    <span class="badge">Modelo en producción — API en vivo</span>
+    <h1>Scoring Crediticio: predicción de riesgo de impago</h1>
+    <p class="lead">Random Forest entrenado sobre 36,457 solicitudes de tarjeta de crédito para anticipar qué clientes se convertirán en mal pagador, con ROC-AUC 0.814 en datos nunca vistos. Explora el análisis completo abajo y prueba el modelo con tus propios datos.</p>
+    <div class="links">
+      <a class="btn btn-primary" href="#predecir">Probar el modelo →</a>
+      <a class="btn btn-ghost" href="https://github.com/cjhirashi/ds-scoring-credito" target="_blank" rel="noopener noreferrer">Ver repositorio</a>
+      <a class="btn btn-ghost" href="https://github.com/cjhirashi/ds-scoring-credito/blob/main/notebooks/analisis_scoring_crediticio.ipynb" target="_blank" rel="noopener noreferrer">Ver notebook</a>
+    </div>
+  </section>
+
+  <div class="kpis">{kpi_html}</div>
+  {''.join(html_graficas)}
+  <div id="predecir">{form_html}</div>
+
+  <footer>
+    <span>Carlos Jiménez Hirashi — Data Scientist &amp; Intelligent Automation Architect</span>
+    <span>Random Forest + scikit-learn · FastAPI · Plotly · Dataset: Kaggle <code>rikdifos/credit-card-approval-prediction</code></span>
+  </footer>
+</div>
 <script>
 document.getElementById('form-prediccion').addEventListener('submit', async (e) => {{
   e.preventDefault();
