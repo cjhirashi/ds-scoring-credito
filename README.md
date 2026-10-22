@@ -9,7 +9,7 @@
 
 ## 🚀 Descripción
 
-Proyecto propio de portafolio (no de TripleTen). Desarrollo de un modelo de **Machine Learning** para predecir si un solicitante de tarjeta de crédito se convertirá en **mal pagador** (atraso ≥60 días en su historial de pagos), usando el dataset de Kaggle [`rikdifos/credit-card-approval-prediction`](https://www.kaggle.com/datasets/rikdifos/credit-card-approval-prediction).
+Proyecto propio de portafolio. Desarrollo de un modelo de **Machine Learning** para predecir si un solicitante de tarjeta de crédito se convertirá en **mal pagador** (atraso ≥60 días en su historial de pagos), usando el dataset de Kaggle [`rikdifos/credit-card-approval-prediction`](https://www.kaggle.com/datasets/rikdifos/credit-card-approval-prediction).
 
 ---
 
