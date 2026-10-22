@@ -89,36 +89,83 @@ fig4 = go.Figure(go.Bar(x=top.values, y=top.index, orientation="h",
 fig4 = layout_base(fig4, "Top 15 variables más importantes")
 fig4.update_layout(xaxis_title="Importancia", height=600)
 
+# --- KPIs resumen ---
+kpis = [
+    ("ROC-AUC (test)", f"{auc:.3f}", "Capacidad del modelo para separar mal pagador de buen pagador. 0.5 = azar, 1.0 = perfecto.", AZUL),
+    ("Desbalance", f"{(y.mean()*100):.1f}%", "Proporción de clientes mal pagador sobre el total con historial — clase minoritaria rara.", ROJO),
+    ("Recall", "36.6%", "De cada 10 malos pagadores reales, el modelo detecta ~4 antes de que incumplan.", VERDE),
+    ("Precision", "18.3%", "De cada 10 alertas del modelo, ~2 son realmente mal pagador — útil como filtro, no como veredicto.", "#F5A623"),
+]
+kpi_html = "".join(f'''
+  <div class="kpi" style="border-top: 3px solid {color}">
+    <div class="kpi-valor" style="color:{color}">{valor}</div>
+    <div class="kpi-label">{label}</div>
+    <div class="kpi-nota">{nota}</div>
+  </div>''' for label, valor, nota, color in kpis)
+
 # --- Página consolidada ---
+graficas = [
+    (fig1, "1 · El problema: clases muy desbalanceadas",
+     "Solo 1.7% de los 36,457 clientes con historial cruzado son mal pagador (atraso ≥60 días). "
+     "Esto obliga a usar <code>class_weight=\"balanced\"</code> y a medir con ROC-AUC/recall en vez de accuracy, "
+     "que con este desbalance sería engañosamente alta incluso prediciendo siempre \"buen pagador\". "
+     "<strong>Pasa el mouse sobre cada barra</strong> para ver el conteo exacto."),
+    (fig2, "2 · Qué tan bien discrimina el modelo",
+     "La curva ROC compara la tasa de verdaderos positivos contra falsos positivos en todos los umbrales de decisión posibles. "
+     "Entre más se aleje la curva azul de la diagonal gris (el azar), mejor separa el modelo ambas clases. "
+     "AUC=0.814 es un resultado sólido para un problema con señal débil y clase minoritaria tan escasa. "
+     "<strong>Haz zoom</strong> arrastrando sobre una zona de la curva para ver el detalle."),
+    (fig3, "3 · Dónde acierta y dónde falla en test",
+     "De 123 clientes que sí eran mal pagador en el conjunto de prueba, el modelo detectó 45 (recall 37%) y dejó pasar 78 sin alertar. "
+     "De los 7,169 buenos pagadores, marcó 201 como falso riesgo. "
+     "Esta es la foto honesta del costo del modelo: prioriza no dejar pasar tantos malos pagadores como sea posible, a cambio de generar falsas alarmas. "
+     "<strong>Pasa el mouse</strong> sobre cada celda para ver el valor."),
+    (fig4, "4 · Qué variables pesan más en la decisión",
+     "Random Forest calcula cuánto reduce cada variable la incertidumbre del modelo al dividir los datos. "
+     "Edad, ingreso total y antigüedad laboral concentran casi la mitad de la señal predictiva — consistente con cómo un analista de crédito evaluaría el riesgo manualmente. "
+     "<strong>Haz scroll/zoom</strong> para comparar el peso relativo de cada variable."),
+]
 html_partes = []
-for fig, descripcion in [
-    (fig1, "Solo 1.7% de los clientes cruzados son mal pagador: fuerte desbalance de clases."),
-    (fig2, "El modelo discrimina mal pagador de buen pagador con ROC-AUC 0.814."),
-    (fig3, "6,968 buenos pagadores bien clasificados; detecta 45 de 123 malos pagadores del test."),
-    (fig4, "Edad, ingreso total y antigüedad laboral concentran la mayor señal predictiva."),
-]:
-    bloque = pio.to_html(fig, include_plotlyjs=False, full_html=False, config={"displayModeBar": False})
-    html_partes.append(f'<div class="grafica"><p class="descripcion">{descripcion}</p>{bloque}</div>')
+for fig, titulo, descripcion in graficas:
+    bloque = pio.to_html(fig, include_plotlyjs=False, full_html=False, config={"displayModeBar": True, "displaylogo": False})
+    html_partes.append(f'''
+  <section class="panel">
+    <h2>{titulo}</h2>
+    <p class="descripcion">{descripcion}</p>
+    {bloque}
+  </section>''')
 
 pagina = f"""<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<title>Scoring Crediticio — Gráficas interactivas</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scoring Crediticio — Dashboard interactivo</title>
 <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 <style>
-  body {{ background:{BG}; color:#eee; font-family: 'Segoe UI', system-ui, sans-serif; max-width: 900px; margin: 0 auto; padding: 30px 20px; }}
-  h1 {{ font-size: 1.6rem; }}
-  p.intro {{ color:#aaa; }}
-  .descripcion {{ color:#ccc; font-size: 0.95rem; margin-bottom: 4px; }}
-  .grafica {{ margin-bottom: 36px; }}
+  * {{ box-sizing: border-box; }}
+  body {{ background:{BG}; color:#eee; font-family: 'Segoe UI', system-ui, sans-serif; max-width: 980px; margin: 0 auto; padding: 30px 20px 60px; line-height: 1.5; }}
+  h1 {{ font-size: 1.7rem; margin-bottom: 4px; }}
+  h2 {{ font-size: 1.15rem; margin: 0 0 10px; color: #fff; }}
+  p.intro {{ color:#999; margin-top: 0; }}
+  .descripcion {{ color:#bbb; font-size: 0.95rem; margin-bottom: 14px; max-width: 760px; }}
+  .descripcion code {{ background:#2a2a2a; padding: 1px 5px; border-radius: 4px; font-size: 0.85em; }}
   a {{ color:{AZUL}; }}
+  .kpis {{ display:grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; margin: 24px 0 36px; }}
+  .kpi {{ background:#262626; border-radius: 10px; padding: 16px 18px; }}
+  .kpi-valor {{ font-size: 1.8rem; font-weight: 700; }}
+  .kpi-label {{ font-size: 0.85rem; color:#ccc; margin-top: 2px; font-weight: 600; }}
+  .kpi-nota {{ font-size: 0.78rem; color:#888; margin-top: 6px; }}
+  .panel {{ background:#242424; border-radius: 12px; padding: 20px 24px 8px; margin-bottom: 28px; }}
+  footer {{ color:#666; font-size: 0.85rem; margin-top: 20px; }}
 </style>
 </head>
 <body>
 <h1>Scoring Crediticio — Predicción de Riesgo de Impago</h1>
-<p class="intro">Gráficas interactivas del análisis. Repo completo: <a href="https://github.com/cjhirashi/ds-scoring-credito">github.com/cjhirashi/ds-scoring-credito</a></p>
+<p class="intro">Dashboard interactivo del análisis. Repo completo: <a href="https://github.com/cjhirashi/ds-scoring-credito">github.com/cjhirashi/ds-scoring-credito</a> · <a href="https://github.com/cjhirashi/ds-scoring-credito/blob/main/notebooks/analisis_scoring_crediticio.ipynb">Notebook</a></p>
+<div class="kpis">{kpi_html}</div>
 {''.join(html_partes)}
+<footer>Generado con Random Forest + scikit-learn, visualizado con Plotly. Dataset: Kaggle <code>rikdifos/credit-card-approval-prediction</code>.</footer>
 </body>
 </html>"""
 
