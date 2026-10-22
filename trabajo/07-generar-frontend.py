@@ -87,7 +87,7 @@ graficas = [
 html_graficas = []
 for fig, titulo, descripcion in graficas:
     bloque = pio.to_html(fig, include_plotlyjs=False, full_html=False, config={"displayModeBar": True, "displaylogo": False})
-    html_graficas.append(f'<section class="panel glass"><h2>{titulo}</h2><p class="descripcion">{descripcion}</p>{bloque}</section>')
+    html_graficas.append(f'<section class="panel card"><h2>{titulo}</h2><p class="descripcion">{descripcion}</p>{bloque}</section>')
 
 kpis = [
     ("ROC-AUC (test)", f"{auc:.3f}", "Capacidad de separar mal pagador de buen pagador. 0.5=azar, 1.0=perfecto.", AZUL),
@@ -95,9 +95,10 @@ kpis = [
     ("Recall", "36.6%", "De cada 10 malos pagadores reales, detecta ~4.", VERDE),
     ("Precision", "18.3%", "De cada 10 alertas, ~2 son realmente mal pagador.", NARANJA),
 ]
-kpi_html = "".join(f'''<div class="kpi glass" style="--kpi-color:{color}">
-  <div class="kpi-valor" style="color:{color}">{valor}</div>
-  <div class="kpi-label">{label}</div><div class="kpi-nota">{nota}</div></div>''' for label, valor, nota, color in kpis)
+kpi_html = "".join(f'''<div class="stat-card" style="--kpi-color:{color}">
+  <div class="stat-card-head"><span>{label}</span></div>
+  <h4>{valor}</h4>
+  <div class="kpi-nota">{nota}</div></div>''' for label, valor, nota, color in kpis)
 
 # --- Formulario de predicción ---
 with open(f"{RUTA_RES}/valores_categoricos.json") as f:
@@ -114,7 +115,7 @@ for campo, opciones in valores_cat.items():
     selects.append(f'<label>{ETIQUETAS_CAMPO[campo]}<select name="{campo}">{opts}</select></label>')
 
 form_html = f'''
-<section class="panel glass">
+<section class="panel card">
   <h2>5 · Prueba el modelo con un registro nuevo</h2>
   <p class="descripcion">Llena los datos de un solicitante y el modelo calcula su probabilidad de convertirse en mal pagador.</p>
   <form id="form-prediccion" class="form-grid">
@@ -141,98 +142,135 @@ pagina = f"""<!DOCTYPE html>
 <title>Scoring Crediticio — Carlos Jiménez Hirashi</title>
 <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 <style>
-  /* Tokens "Glass Steel" — idénticos a cjhirashi-career-portfolio (tema dark), ver cjhirashi-srv/README.md */
+  /*
+   * Tokens "Glass Steel" copiados literal de cjhirashi-career-portfolio
+   * (src/index.css, tema [data-theme="dark"]) — no reconstruidos de memoria.
+   */
   :root {{
     --bg-primary: #071018;
+    --bg-secondary: rgba(16, 30, 42, 0.6);
     --bg-glass: rgba(12, 24, 34, 0.7);
     --bg-card: rgba(26, 48, 64, 0.5);
     --text-primary: #f8fafc;
     --text-secondary: #a3b6c0;
     --text-muted: #6b808a;
     --border-glass: rgba(255, 255, 255, 0.09);
+    --border-glass-hover: rgba(34, 211, 238, 0.5);
     --primary-color: #06b6d4;
     --primary-hover: #0891b2;
     --primary-light: rgba(34, 211, 238, 0.16);
     --primary-glow: rgba(34, 211, 238, 0.35);
     --secondary-color: #94a3b8;
     --secondary-hover: #64748b;
-    --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+    --secondary-light: rgba(148, 163, 184, 0.16);
+    --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    --shadow-glow: 0 0 30px var(--primary-glow);
     --radius-sm: 12px; --radius-md: 16px; --radius-lg: 24px;
+    --ambient-cyan: rgba(34, 211, 238, 0.2);
+    --ambient-steel: rgba(148, 163, 184, 0.18);
+    --error-bg: rgba(239, 68, 68, 0.15); --error-text: #f87171; --error-border: rgba(239, 68, 68, 0.3);
+    --warning-bg: rgba(245, 158, 11, 0.15); --warning-text: #fbbf24; --warning-border: rgba(245, 158, 11, 0.3);
+    --success-bg: rgba(16, 185, 129, 0.15); --success-text: #34d399; --success-border: rgba(16, 185, 129, 0.3);
     --rojo: {ROJO}; --verde: {VERDE}; --naranja: {NARANJA};
     --font: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     --mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   }}
   * {{ box-sizing: border-box; }}
   body {{
-    background: var(--bg-primary); color: var(--text-primary); font-family: var(--font);
-    margin: 0; line-height: 1.6; -webkit-font-smoothing: antialiased;
+    color: var(--text-primary); font-family: var(--font); margin: 0; line-height: 1.6;
+    -webkit-font-smoothing: antialiased; overflow-x: hidden;
+    background-color: var(--bg-primary);
+    background-image:
+      radial-gradient(circle at 10% 20%, var(--ambient-cyan) 0%, transparent 45%),
+      radial-gradient(circle at 90% 80%, var(--ambient-steel) 0%, transparent 45%);
+    background-attachment: fixed; background-repeat: no-repeat; background-size: cover;
   }}
-  .wrap {{ max-width: 1040px; margin: 0 auto; padding: 0 24px 80px; }}
+  .wrap {{ max-width: 1040px; margin: 0 auto; padding: 0 24px 80px; position: relative; }}
   a {{ color: var(--primary-color); text-decoration: none; }}
   a:hover {{ text-decoration: underline; }}
-  code {{ font-family: var(--mono); background: var(--bg-glass); padding: 2px 6px; border-radius: 5px; font-size: 0.85em; border: 1px solid var(--border-glass); }}
+  code {{ font-family: var(--mono); background: var(--bg-card); padding: 2px 6px; border-radius: 5px; font-size: 0.85em; border: 1px solid var(--border-glass); }}
 
-  /* Vidrio: paneles translúcidos con blur sobre el fondo sólido, no gradiente de color */
-  .glass {{
-    background: var(--bg-glass); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-    border: 1px solid var(--border-glass); box-shadow: var(--shadow-glass);
+  /* .card — idéntica a cjhirashi-career-portfolio */
+  .card {{
+    background-color: var(--bg-card); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border-glass); border-radius: var(--radius-md); box-shadow: var(--shadow-glass);
+    transition: transform 250ms ease, border-color 250ms ease, box-shadow 250ms ease;
   }}
+  .card:hover {{ transform: translateY(-4px); border-color: var(--border-glass-hover); }}
+
+  /* .badge + variantes — idénticas */
+  .badge {{
+    display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.3rem 0.8rem;
+    border-radius: 9999px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+    backdrop-filter: blur(8px); border: 1px solid transparent; margin-bottom: 20px;
+  }}
+  .badge-primary {{ background-color: var(--primary-light); color: var(--primary-color); border-color: rgba(34, 211, 238, 0.3); }}
+  .badge-secondary {{ background-color: var(--secondary-light); color: var(--secondary-color); border-color: rgba(148, 163, 184, 0.3); }}
+  .badge-success {{ background-color: var(--success-bg); color: var(--success-text); border-color: var(--success-border); }}
+  .badge-warning {{ background-color: var(--warning-bg); color: var(--warning-text); border-color: var(--warning-border); }}
+  .badge-error {{ background-color: var(--error-bg); color: var(--error-text); border-color: var(--error-border); }}
+
+  /* .btn / .btn-secondary — idénticas */
+  .btn {{
+    display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 11px 20px;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover)); color: #fff;
+    border: none; border-radius: var(--radius-sm); box-shadow: 0 4px 20px var(--primary-glow);
+    font-weight: 600; font-size: 0.92rem; cursor: pointer;
+    transition: transform 200ms ease, box-shadow 200ms ease, opacity 200ms ease;
+  }}
+  .btn:hover {{ transform: translateY(-2px); box-shadow: 0 6px 28px var(--primary-glow); text-decoration: none; }}
+  .btn-secondary {{
+    display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 11px 20px;
+    background-color: var(--bg-glass); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    color: var(--text-primary); border: 1px solid var(--border-glass); border-radius: var(--radius-sm);
+    font-weight: 600; font-size: 0.92rem;
+    transition: transform 200ms ease, border-color 200ms ease;
+  }}
+  .btn-secondary:hover {{ transform: translateY(-2px); border-color: var(--border-glass-hover); color: var(--primary-color); text-decoration: none; }}
 
   /* Hero */
   .hero {{ padding: 72px 0 40px; text-align: left; }}
-  .badge {{
-    display: inline-flex; align-items: center; gap: 8px; background: var(--primary-light);
-    border: 1px solid var(--primary-glow); color: var(--primary-color); font-size: 0.78rem;
-    font-weight: 600; padding: 6px 14px; border-radius: 999px; margin-bottom: 20px; letter-spacing: 0.02em;
-  }}
-  .badge::before {{ content: '●'; color: var(--verde); font-size: 0.6rem; }}
   .hero h1 {{
     font-size: clamp(2rem, 4.5vw, 2.9rem); font-weight: 800; letter-spacing: -0.02em;
     margin: 0 0 16px; line-height: 1.12; color: var(--text-primary);
   }}
   .hero p.lead {{ font-size: 1.1rem; color: var(--text-secondary); max-width: 640px; margin: 0 0 28px; }}
   .hero .links {{ display: flex; gap: 12px; flex-wrap: wrap; }}
-  .btn {{
-    display: inline-flex; align-items: center; gap: 8px; padding: 11px 20px; border-radius: var(--radius-sm);
-    font-weight: 600; font-size: 0.92rem; border: 1px solid var(--border-glass); transition: all .15s ease;
-  }}
-  .btn:hover {{ text-decoration: none; transform: translateY(-1px); }}
-  .btn-primary {{ background: var(--primary-color); color: #04121a; border-color: var(--primary-color); }}
-  .btn-primary:hover {{ background: var(--primary-hover); box-shadow: 0 6px 20px var(--primary-glow); }}
-  .btn-ghost {{ background: var(--bg-card); color: var(--text-primary); backdrop-filter: blur(16px); }}
-  .btn-ghost:hover {{ border-color: var(--secondary-color); }}
 
   h2 {{ font-size: 1.2rem; font-weight: 700; margin: 0 0 8px; color: var(--text-primary); letter-spacing: -0.01em; }}
 
-  /* KPIs */
+  /* KPIs — patrón .stat-card idéntico al dashboard.html de referencia */
   .kpis {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin: 8px 0 48px; }}
-  .kpi {{
-    border-radius: var(--radius-md); padding: 20px 22px; position: relative; overflow: hidden;
-    transition: border-color .15s ease;
+  .stat-card {{
+    background-color: var(--bg-card); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 1.25rem 1.5rem;
+    box-shadow: var(--shadow-glass); display: flex; flex-direction: column; gap: 0.5rem;
   }}
-  .kpi:hover {{ border-color: var(--secondary-color); }}
-  .kpi::before {{ content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--kpi-color, var(--primary-color)); }}
-  .kpi-valor {{ font-size: 2rem; font-weight: 800; font-family: var(--mono); letter-spacing: -0.02em; }}
-  .kpi-label {{ font-size: 0.82rem; color: var(--text-primary); margin-top: 4px; font-weight: 600; }}
-  .kpi-nota {{ font-size: 0.78rem; color: var(--text-muted); margin-top: 8px; line-height: 1.4; }}
+  .stat-card-head {{ display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }}
+  .stat-card-head > span {{ font-size: 0.7rem; font-weight: 600; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.05em; }}
+  .stat-card h4 {{ font-size: 1.875rem; font-weight: 700; font-family: var(--mono); margin: 0; color: var(--kpi-color, var(--text-primary)); }}
+  .kpi-nota {{ font-size: 0.78rem; color: var(--text-muted); line-height: 1.4; }}
 
   /* Panels */
-  .panel {{ border-radius: var(--radius-lg); padding: 28px 28px 12px; margin-bottom: 24px; }}
+  .panel {{ padding: 28px 28px 12px; margin-bottom: 24px; }}
   .descripcion {{ color: var(--text-secondary); font-size: 0.95rem; margin: 0 0 18px; max-width: 760px; }}
 
-  /* Formulario */
+  /* Formulario — mismo tratamiento que .input-field */
   .form-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; padding-bottom: 20px; }}
   .form-grid label {{ display: flex; flex-direction: column; font-size: 0.82rem; color: var(--text-secondary); gap: 6px; font-weight: 500; }}
   .form-grid label.checkbox {{ flex-direction: row; align-items: center; gap: 10px; }}
   .form-grid select, .form-grid input[type=number] {{
-    background: var(--bg-card); border: 1px solid var(--border-glass); color: var(--text-primary);
+    background-color: var(--bg-card); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border-glass); color: var(--text-primary);
     border-radius: var(--radius-sm); padding: 10px 12px; font-family: var(--font); font-size: 0.92rem;
-    transition: border-color .15s ease;
+    transition: border-color 200ms ease, box-shadow 200ms ease;
   }}
-  .form-grid select:focus, .form-grid input:focus {{ outline: none; border-color: var(--primary-color); }}
+  .form-grid select:focus, .form-grid input:focus {{
+    outline: none; border-color: var(--border-glass-hover); box-shadow: 0 0 0 2px var(--primary-glow);
+  }}
   .form-grid input[type=checkbox] {{ width: 16px; height: 16px; accent-color: var(--primary-color); }}
   button[type=submit] {{
-    grid-column: 1 / -1; background: var(--primary-color); color: #04121a;
+    grid-column: 1 / -1; background: linear-gradient(135deg, var(--primary-color), var(--primary-hover)); color: #fff;
     font-weight: 700; border: none; border-radius: var(--radius-sm); padding: 14px; cursor: pointer;
     font-size: 0.98rem; margin-top: 4px; transition: all .15s ease;
   }}
@@ -240,6 +278,8 @@ pagina = f"""<!DOCTYPE html>
   #resultado-prediccion {{ padding: 18px 0 20px; font-size: 1rem; min-height: 1.2em; }}
   .resultado-ok {{ color: var(--verde); font-weight: 700; }}
   .resultado-riesgo {{ color: var(--rojo); font-weight: 700; }}
+
+  .mono {{ font-family: var(--mono); }}
 
   footer {{
     color: var(--text-muted); font-size: 0.85rem; margin-top: 40px; padding-top: 24px;
@@ -251,13 +291,16 @@ pagina = f"""<!DOCTYPE html>
 <body>
 <div class="wrap">
   <section class="hero">
-    <span class="badge">Modelo en producción — API en vivo</span>
+    <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+      <span class="badge badge-success">Modelo en producción</span>
+      <span class="badge badge-primary">API en vivo</span>
+    </div>
     <h1>Scoring Crediticio: predicción de riesgo de impago</h1>
     <p class="lead">Random Forest entrenado sobre 36,457 solicitudes de tarjeta de crédito para anticipar qué clientes se convertirán en mal pagador, con ROC-AUC 0.814 en datos nunca vistos. Explora el análisis completo abajo y prueba el modelo con tus propios datos.</p>
     <div class="links">
-      <a class="btn btn-primary" href="#predecir">Probar el modelo →</a>
-      <a class="btn btn-ghost" href="https://github.com/cjhirashi/ds-scoring-credito" target="_blank" rel="noopener noreferrer">Ver repositorio</a>
-      <a class="btn btn-ghost" href="https://github.com/cjhirashi/ds-scoring-credito/blob/main/notebooks/analisis_scoring_crediticio.ipynb" target="_blank" rel="noopener noreferrer">Ver notebook</a>
+      <a class="btn" href="#predecir">Probar el modelo →</a>
+      <a class="btn-secondary" href="https://github.com/cjhirashi/ds-scoring-credito" target="_blank" rel="noopener noreferrer">Ver repositorio</a>
+      <a class="btn-secondary" href="https://github.com/cjhirashi/ds-scoring-credito/blob/main/notebooks/analisis_scoring_crediticio.ipynb" target="_blank" rel="noopener noreferrer">Ver notebook</a>
     </div>
   </section>
 
