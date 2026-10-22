@@ -119,7 +119,7 @@ Solo **36,457 de 438,510** clientes de `application_record` tienen historial en 
 
 ## 📊 Resultados
 
-![Distribución de la etiqueta](resultados/fig_01_distribucion_etiqueta.png)
+![Distribución de la etiqueta](https://raw.githubusercontent.com/cjhirashi/ds-scoring-credito/main/resultados/fig_01_distribucion_etiqueta.png)
 
 ### 🔹 Comparación de modelos base (test, split simple)
 
@@ -147,13 +147,13 @@ Seleccionado por `GridSearchCV` con validación cruzada 5-fold sobre ROC-AUC: **
 
 El resultado en CV y test es consistente, sin señal fuerte de sobreajuste.
 
-![Curva ROC](resultados/fig_02_curva_roc.png)
+![Curva ROC](https://raw.githubusercontent.com/cjhirashi/ds-scoring-credito/main/resultados/fig_02_curva_roc.png)
 
-![Matriz de confusión](resultados/fig_03_matriz_confusion.png)
+![Matriz de confusión](https://raw.githubusercontent.com/cjhirashi/ds-scoring-credito/main/resultados/fig_03_matriz_confusion.png)
 
 ### 🔹 Variables más importantes
 
-![Importancia de variables](resultados/fig_04_importancia_variables.png)
+![Importancia de variables](https://raw.githubusercontent.com/cjhirashi/ds-scoring-credito/main/resultados/fig_04_importancia_variables.png)
 
 Edad, ingreso total y antigüedad laboral concentran la mayor parte de la señal predictiva.
 
