@@ -10,8 +10,8 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import roc_curve, roc_auc_score, confusion_matrix
 
 pio.templates.default = "plotly_dark"
-BG = "#1a1e27"
-AZUL, ROJO, VERDE, NARANJA = "#4C9AFF", "#FF6B6B", "#5FD3A3", "#F5A623"
+BG = "#0c1822"
+AZUL, ROJO, VERDE, NARANJA = "#06b6d4", "#FF6B6B", "#5FD3A3", "#F5A623"
 
 RANDOM_STATE = 42
 RUTA_RES = "../resultados"
@@ -52,7 +52,7 @@ fpr, tpr, _ = roc_curve(y_test, proba_test)
 auc = roc_auc_score(y_test, proba_test)
 fig2 = go.Figure()
 fig2.add_trace(go.Scatter(x=fpr, y=tpr, mode="lines", name=f"Random Forest (AUC={auc:.3f})",
-                           line=dict(color=AZUL, width=3), fill="tozeroy", fillcolor="rgba(76,154,255,0.15)"))
+                           line=dict(color=AZUL, width=3), fill="tozeroy", fillcolor="rgba(6,182,212,0.15)"))
 fig2.add_trace(go.Scatter(x=[0, 1], y=[0, 1], mode="lines", name="Azar (AUC=0.5)", line=dict(color="gray", dash="dash")))
 fig2 = layout_base(fig2, "Curva ROC — modelo final en test")
 fig2.update_layout(xaxis_title="Tasa de falsos positivos", yaxis_title="Tasa de verdaderos positivos")
@@ -87,7 +87,7 @@ graficas = [
 html_graficas = []
 for fig, titulo, descripcion in graficas:
     bloque = pio.to_html(fig, include_plotlyjs=False, full_html=False, config={"displayModeBar": True, "displaylogo": False})
-    html_graficas.append(f'<section class="panel"><h2>{titulo}</h2><p class="descripcion">{descripcion}</p>{bloque}</section>')
+    html_graficas.append(f'<section class="panel glass"><h2>{titulo}</h2><p class="descripcion">{descripcion}</p>{bloque}</section>')
 
 kpis = [
     ("ROC-AUC (test)", f"{auc:.3f}", "Capacidad de separar mal pagador de buen pagador. 0.5=azar, 1.0=perfecto.", AZUL),
@@ -95,7 +95,7 @@ kpis = [
     ("Recall", "36.6%", "De cada 10 malos pagadores reales, detecta ~4.", VERDE),
     ("Precision", "18.3%", "De cada 10 alertas, ~2 son realmente mal pagador.", NARANJA),
 ]
-kpi_html = "".join(f'''<div class="kpi" style="--kpi-color:{color}">
+kpi_html = "".join(f'''<div class="kpi glass" style="--kpi-color:{color}">
   <div class="kpi-valor" style="color:{color}">{valor}</div>
   <div class="kpi-label">{label}</div><div class="kpi-nota">{nota}</div></div>''' for label, valor, nota, color in kpis)
 
@@ -114,7 +114,7 @@ for campo, opciones in valores_cat.items():
     selects.append(f'<label>{ETIQUETAS_CAMPO[campo]}<select name="{campo}">{opts}</select></label>')
 
 form_html = f'''
-<section class="panel">
+<section class="panel glass">
   <h2>5 · Prueba el modelo con un registro nuevo</h2>
   <p class="descripcion">Llena los datos de un solicitante y el modelo calcula su probabilidad de convertirse en mal pagador.</p>
   <form id="form-prediccion" class="form-grid">
@@ -139,101 +139,113 @@ pagina = f"""<!DOCTYPE html>
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Scoring Crediticio — Carlos Jiménez Hirashi</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 <style>
+  /* Tokens "Glass Steel" — idénticos a cjhirashi-career-portfolio (tema dark), ver cjhirashi-srv/README.md */
   :root {{
-    --bg: #0f1115; --bg-elev: #161920; --card: #1a1e27; --card-hover: #1f2430;
-    --border: #272c38; --text: #e8eaf0; --text-dim: #9aa0b0; --text-faint: #686f82;
-    --azul: {AZUL}; --rojo: {ROJO}; --verde: {VERDE}; --naranja: {NARANJA};
-    --font: 'Inter', system-ui, sans-serif; --mono: 'JetBrains Mono', monospace;
-    --radius: 14px;
+    --bg-primary: #071018;
+    --bg-glass: rgba(12, 24, 34, 0.7);
+    --bg-card: rgba(26, 48, 64, 0.5);
+    --text-primary: #f8fafc;
+    --text-secondary: #a3b6c0;
+    --text-muted: #6b808a;
+    --border-glass: rgba(255, 255, 255, 0.09);
+    --primary-color: #06b6d4;
+    --primary-hover: #0891b2;
+    --primary-light: rgba(34, 211, 238, 0.16);
+    --primary-glow: rgba(34, 211, 238, 0.35);
+    --secondary-color: #94a3b8;
+    --secondary-hover: #64748b;
+    --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+    --radius-sm: 12px; --radius-md: 16px; --radius-lg: 24px;
+    --rojo: {ROJO}; --verde: {VERDE}; --naranja: {NARANJA};
+    --font: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   }}
   * {{ box-sizing: border-box; }}
   body {{
-    background: radial-gradient(ellipse 1200px 600px at 50% -10%, #1a2436 0%, var(--bg) 55%);
-    color: var(--text); font-family: var(--font); margin: 0; line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
+    background: var(--bg-primary); color: var(--text-primary); font-family: var(--font);
+    margin: 0; line-height: 1.6; -webkit-font-smoothing: antialiased;
   }}
   .wrap {{ max-width: 1040px; margin: 0 auto; padding: 0 24px 80px; }}
-  a {{ color: var(--azul); text-decoration: none; }}
+  a {{ color: var(--primary-color); text-decoration: none; }}
   a:hover {{ text-decoration: underline; }}
-  code {{ font-family: var(--mono); background: #10131a; padding: 2px 6px; border-radius: 5px; font-size: 0.85em; border: 1px solid var(--border); }}
+  code {{ font-family: var(--mono); background: var(--bg-glass); padding: 2px 6px; border-radius: 5px; font-size: 0.85em; border: 1px solid var(--border-glass); }}
+
+  /* Vidrio: paneles translúcidos con blur sobre el fondo sólido, no gradiente de color */
+  .glass {{
+    background: var(--bg-glass); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border-glass); box-shadow: var(--shadow-glass);
+  }}
 
   /* Hero */
   .hero {{ padding: 72px 0 40px; text-align: left; }}
   .badge {{
-    display: inline-flex; align-items: center; gap: 8px; background: rgba(76,154,255,0.1);
-    border: 1px solid rgba(76,154,255,0.3); color: var(--azul); font-size: 0.78rem;
+    display: inline-flex; align-items: center; gap: 8px; background: var(--primary-light);
+    border: 1px solid var(--primary-glow); color: var(--primary-color); font-size: 0.78rem;
     font-weight: 600; padding: 6px 14px; border-radius: 999px; margin-bottom: 20px; letter-spacing: 0.02em;
   }}
   .badge::before {{ content: '●'; color: var(--verde); font-size: 0.6rem; }}
   .hero h1 {{
     font-size: clamp(2rem, 4.5vw, 2.9rem); font-weight: 800; letter-spacing: -0.02em;
-    margin: 0 0 16px; line-height: 1.12;
-    background: linear-gradient(135deg, #fff 30%, #aab4cc 100%);
-    -webkit-background-clip: text; background-clip: text; color: transparent;
+    margin: 0 0 16px; line-height: 1.12; color: var(--text-primary);
   }}
-  .hero p.lead {{ font-size: 1.1rem; color: var(--text-dim); max-width: 640px; margin: 0 0 28px; }}
+  .hero p.lead {{ font-size: 1.1rem; color: var(--text-secondary); max-width: 640px; margin: 0 0 28px; }}
   .hero .links {{ display: flex; gap: 12px; flex-wrap: wrap; }}
   .btn {{
-    display: inline-flex; align-items: center; gap: 8px; padding: 11px 20px; border-radius: 10px;
-    font-weight: 600; font-size: 0.92rem; border: 1px solid var(--border); transition: all .15s ease;
+    display: inline-flex; align-items: center; gap: 8px; padding: 11px 20px; border-radius: var(--radius-sm);
+    font-weight: 600; font-size: 0.92rem; border: 1px solid var(--border-glass); transition: all .15s ease;
   }}
   .btn:hover {{ text-decoration: none; transform: translateY(-1px); }}
-  .btn-primary {{ background: var(--azul); color: #0a0f1a; border-color: var(--azul); }}
-  .btn-primary:hover {{ box-shadow: 0 6px 20px rgba(76,154,255,0.35); }}
-  .btn-ghost {{ background: var(--card); color: var(--text); }}
-  .btn-ghost:hover {{ background: var(--card-hover); border-color: var(--text-faint); }}
+  .btn-primary {{ background: var(--primary-color); color: #04121a; border-color: var(--primary-color); }}
+  .btn-primary:hover {{ background: var(--primary-hover); box-shadow: 0 6px 20px var(--primary-glow); }}
+  .btn-ghost {{ background: var(--bg-card); color: var(--text-primary); backdrop-filter: blur(16px); }}
+  .btn-ghost:hover {{ border-color: var(--secondary-color); }}
 
-  h2 {{ font-size: 1.2rem; font-weight: 700; margin: 0 0 8px; color: #fff; letter-spacing: -0.01em; }}
-  .section-label {{ font-size: 0.78rem; font-weight: 700; color: var(--azul); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; }}
+  h2 {{ font-size: 1.2rem; font-weight: 700; margin: 0 0 8px; color: var(--text-primary); letter-spacing: -0.01em; }}
 
   /* KPIs */
   .kpis {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin: 8px 0 48px; }}
   .kpi {{
-    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
-    padding: 20px 22px; position: relative; overflow: hidden; transition: border-color .15s ease;
+    border-radius: var(--radius-md); padding: 20px 22px; position: relative; overflow: hidden;
+    transition: border-color .15s ease;
   }}
-  .kpi:hover {{ border-color: var(--text-faint); }}
-  .kpi::before {{ content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--kpi-color, var(--azul)); }}
+  .kpi:hover {{ border-color: var(--secondary-color); }}
+  .kpi::before {{ content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--kpi-color, var(--primary-color)); }}
   .kpi-valor {{ font-size: 2rem; font-weight: 800; font-family: var(--mono); letter-spacing: -0.02em; }}
-  .kpi-label {{ font-size: 0.82rem; color: var(--text); margin-top: 4px; font-weight: 600; }}
-  .kpi-nota {{ font-size: 0.78rem; color: var(--text-faint); margin-top: 8px; line-height: 1.4; }}
+  .kpi-label {{ font-size: 0.82rem; color: var(--text-primary); margin-top: 4px; font-weight: 600; }}
+  .kpi-nota {{ font-size: 0.78rem; color: var(--text-muted); margin-top: 8px; line-height: 1.4; }}
 
   /* Panels */
-  .panel {{
-    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
-    padding: 28px 28px 12px; margin-bottom: 24px;
-  }}
-  .descripcion {{ color: var(--text-dim); font-size: 0.95rem; margin: 0 0 18px; max-width: 760px; }}
+  .panel {{ border-radius: var(--radius-lg); padding: 28px 28px 12px; margin-bottom: 24px; }}
+  .descripcion {{ color: var(--text-secondary); font-size: 0.95rem; margin: 0 0 18px; max-width: 760px; }}
 
   /* Formulario */
   .form-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; padding-bottom: 20px; }}
-  .form-grid label {{ display: flex; flex-direction: column; font-size: 0.82rem; color: var(--text-dim); gap: 6px; font-weight: 500; }}
+  .form-grid label {{ display: flex; flex-direction: column; font-size: 0.82rem; color: var(--text-secondary); gap: 6px; font-weight: 500; }}
   .form-grid label.checkbox {{ flex-direction: row; align-items: center; gap: 10px; }}
   .form-grid select, .form-grid input[type=number] {{
-    background: var(--bg-elev); border: 1px solid var(--border); color: var(--text);
-    border-radius: 8px; padding: 10px 12px; font-family: var(--font); font-size: 0.92rem; transition: border-color .15s ease;
+    background: var(--bg-card); border: 1px solid var(--border-glass); color: var(--text-primary);
+    border-radius: var(--radius-sm); padding: 10px 12px; font-family: var(--font); font-size: 0.92rem;
+    transition: border-color .15s ease;
   }}
-  .form-grid select:focus, .form-grid input:focus {{ outline: none; border-color: var(--azul); }}
-  .form-grid input[type=checkbox] {{ width: 16px; height: 16px; accent-color: var(--azul); }}
+  .form-grid select:focus, .form-grid input:focus {{ outline: none; border-color: var(--primary-color); }}
+  .form-grid input[type=checkbox] {{ width: 16px; height: 16px; accent-color: var(--primary-color); }}
   button[type=submit] {{
-    grid-column: 1 / -1; background: linear-gradient(135deg, var(--azul), #3f7fd6); color: #0a0f1a;
-    font-weight: 700; border: none; border-radius: 10px; padding: 14px; cursor: pointer;
+    grid-column: 1 / -1; background: var(--primary-color); color: #04121a;
+    font-weight: 700; border: none; border-radius: var(--radius-sm); padding: 14px; cursor: pointer;
     font-size: 0.98rem; margin-top: 4px; transition: all .15s ease;
   }}
-  button[type=submit]:hover {{ box-shadow: 0 6px 24px rgba(76,154,255,0.35); transform: translateY(-1px); }}
+  button[type=submit]:hover {{ background: var(--primary-hover); box-shadow: 0 6px 24px var(--primary-glow); transform: translateY(-1px); }}
   #resultado-prediccion {{ padding: 18px 0 20px; font-size: 1rem; min-height: 1.2em; }}
   .resultado-ok {{ color: var(--verde); font-weight: 700; }}
   .resultado-riesgo {{ color: var(--rojo); font-weight: 700; }}
 
   footer {{
-    color: var(--text-faint); font-size: 0.85rem; margin-top: 40px; padding-top: 24px;
-    border-top: 1px solid var(--border); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+    color: var(--text-muted); font-size: 0.85rem; margin-top: 40px; padding-top: 24px;
+    border-top: 1px solid var(--border-glass); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px;
   }}
+  footer .mono {{ font-family: var(--mono); }}
 </style>
 </head>
 <body>
@@ -255,7 +267,7 @@ pagina = f"""<!DOCTYPE html>
 
   <footer>
     <span>Carlos Jiménez Hirashi — Data Scientist &amp; Intelligent Automation Architect</span>
-    <span>Random Forest + scikit-learn · FastAPI · Plotly · Dataset: Kaggle <code>rikdifos/credit-card-approval-prediction</code></span>
+    <span class="mono">Random Forest + scikit-learn · FastAPI · Plotly · Dataset: Kaggle rikdifos/credit-card-approval-prediction</span>
   </footer>
 </div>
 <script>
