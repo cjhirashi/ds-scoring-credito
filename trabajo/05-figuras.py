@@ -11,6 +11,11 @@ from sklearn.pipeline import Pipeline
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import roc_curve, roc_auc_score, ConfusionMatrixDisplay, confusion_matrix
 
+plt.style.use("dark_background")
+plt.rcParams["savefig.facecolor"] = "#1e1e1e"
+plt.rcParams["figure.facecolor"] = "#1e1e1e"
+plt.rcParams["axes.facecolor"] = "#1e1e1e"
+
 RANDOM_STATE = 42
 RUTA_RES = "../resultados"
 
@@ -70,7 +75,7 @@ plt.close()
 # --- 4. Matriz de confusión ---
 fig, ax = plt.subplots(figsize=(5, 5))
 cm = confusion_matrix(y_test, pred_test)
-ConfusionMatrixDisplay(cm, display_labels=["Buen pagador", "Mal pagador"]).plot(ax=ax, cmap="Blues", colorbar=False)
+ConfusionMatrixDisplay(cm, display_labels=["Buen pagador", "Mal pagador"]).plot(ax=ax, cmap="viridis", colorbar=False)
 ax.set_title("Matriz de confusión — test")
 plt.tight_layout()
 plt.savefig(f"{RUTA_RES}/fig_03_matriz_confusion.png", dpi=120)
