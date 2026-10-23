@@ -33,7 +33,8 @@ def layout_base(fig, titulo, height=440):
     # contenedor en vez de imponer un ancho/alto fijo que se ve mal en móvil.
     fig.update_layout(title=titulo, paper_bgcolor=BG, plot_bgcolor=BG,
                        font=dict(size=13), margin=dict(l=50, r=20, t=50, b=40),
-                       autosize=True)
+                       autosize=True,
+                       xaxis=dict(automargin=True), yaxis=dict(automargin=True))
     fig._alto_ref = height
     return fig
 
@@ -279,6 +280,12 @@ pagina = f"""<!DOCTYPE html>
     .hero {{ padding: 48px 0 28px; }}
     .panel {{ padding: 18px 16px 10px; }}
     .modebar-container {{ display: none !important; }}
+    /* En móvil la proporción de escritorio (ancho_ref/alto_ref, ~980/440)
+       deja el contenedor demasiado bajo y el título choca con los ejes.
+       Se fuerza una relación más alta (!important vence al aspect-ratio
+       inline, ya que un !important de hoja de estilos supera a un estilo
+       inline sin !important). */
+    .plot-wrap {{ aspect-ratio: 3 / 4 !important; }}
   }}
 
   /* Formulario — mismo tratamiento que .input-field */

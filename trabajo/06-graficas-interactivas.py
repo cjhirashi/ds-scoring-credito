@@ -31,8 +31,10 @@ def layout_base(fig, titulo):
     fig.update_layout(
         title=titulo, paper_bgcolor=BG, plot_bgcolor=BG,
         font=dict(size=14), margin=dict(l=60, r=30, t=60, b=50),
-        height=500,
+        autosize=True,
+        xaxis=dict(automargin=True), yaxis=dict(automargin=True),
     )
+    fig._alto_ref = 500
     return fig
 
 # --- 1. Distribución de la etiqueta ---
@@ -87,7 +89,8 @@ top = pd.Series(importancias, index=nombres).sort_values(ascending=True).tail(15
 fig4 = go.Figure(go.Bar(x=top.values, y=top.index, orientation="h",
                          marker=dict(color=top.values, colorscale="Teal")))
 fig4 = layout_base(fig4, "Top 15 variables más importantes")
-fig4.update_layout(xaxis_title="Importancia", height=600)
+fig4.update_layout(xaxis_title="Importancia")
+fig4._alto_ref = 600
 
 # --- KPIs resumen ---
 kpis = [
@@ -127,12 +130,16 @@ graficas = [
 ]
 html_partes = []
 for fig, titulo, descripcion in graficas:
-    bloque = pio.to_html(fig, include_plotlyjs=False, full_html=False, config={"displayModeBar": True, "displaylogo": False})
+    bloque = pio.to_html(
+        fig, include_plotlyjs=False, full_html=False,
+        default_width="100%", default_height="100%",
+        config={"displayModeBar": True, "displaylogo": False, "responsive": True},
+    )
     html_partes.append(f'''
   <section class="panel">
     <h2>{titulo}</h2>
     <p class="descripcion">{descripcion}</p>
-    {bloque}
+    <div class="plot-wrap" style="aspect-ratio:980/{fig._alto_ref};">{bloque}</div>
   </section>''')
 
 pagina = f"""<!DOCTYPE html>
@@ -158,6 +165,11 @@ pagina = f"""<!DOCTYPE html>
   .kpi-nota {{ font-size: 0.78rem; color:#888; margin-top: 6px; }}
   .panel {{ background:#242424; border-radius: 12px; padding: 20px 24px 8px; margin-bottom: 28px; }}
   footer {{ color:#666; font-size: 0.85rem; margin-top: 20px; }}
+  .plot-wrap {{ width: 100%; position: relative; }}
+  .plot-wrap .plotly-graph-div {{ width: 100% !important; height: 100% !important; position: absolute; inset: 0; }}
+  @media (max-width: 640px) {{
+    .plot-wrap {{ aspect-ratio: 3 / 4 !important; }}
+  }}
 </style>
 </head>
 <body>
