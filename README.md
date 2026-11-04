@@ -9,7 +9,7 @@
 
 ## 🚀 Descripción
 
-Proyecto propio de portafolio. Desarrollo de un modelo de **Machine Learning** para predecir si un solicitante de tarjeta de crédito se convertirá en **mal pagador** (atraso ≥60 días en su historial de pagos), usando el dataset de Kaggle [`rikdifos/credit-card-approval-prediction`](https://www.kaggle.com/datasets/rikdifos/credit-card-approval-prediction).
+Proyecto de portafolio tomado de Kaggle (el problema y los datos son del dataset público, no un planteamiento propio). Desarrollo de un modelo de **Machine Learning** para predecir si un solicitante de tarjeta de crédito se convertirá en **mal pagador** (atraso ≥60 días en su historial de pagos), usando el dataset de Kaggle [`rikdifos/credit-card-approval-prediction`](https://www.kaggle.com/datasets/rikdifos/credit-card-approval-prediction).
 
 Accede al Notebook: [notebooks/analisis_scoring_crediticio.ipynb](https://github.com/cjhirashi/ds-scoring-credito/blob/main/notebooks/analisis_scoring_crediticio.ipynb) — con el análisis narrado paso a paso y las gráficas del resultado.
 
