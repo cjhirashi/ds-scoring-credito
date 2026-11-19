@@ -96,7 +96,7 @@ fig4._alto_ref = 600
 kpis = [
     ("ROC-AUC (test)", f"{auc:.3f}", "Capacidad del modelo para separar mal pagador de buen pagador. 0.5 = azar, 1.0 = perfecto.", AZUL),
     ("Desbalance", f"{(y.mean()*100):.1f}%", "Proporción de clientes mal pagador sobre el total con historial — clase minoritaria rara.", ROJO),
-    ("Recall", "36.6%", "De cada 10 malos pagadores reales, el modelo detecta ~4 antes de que incumplan.", VERDE),
+    ("Recall (umbral 0.5)", "36.6%", "Con el umbral por defecto detecta ~4 de cada 10 malos pagadores; con el umbral 0.15, elegido por costo, detecta 46%.", VERDE),
     ("Precision", "18.3%", "De cada 10 alertas del modelo, ~2 son realmente mal pagador — útil como filtro, no como veredicto.", "#F5A623"),
 ]
 kpi_html = "".join(f'''
@@ -119,7 +119,7 @@ graficas = [
      "AUC=0.814 es un resultado sólido para un problema con señal débil y clase minoritaria tan escasa. "
      "<strong>Haz zoom</strong> arrastrando sobre una zona de la curva para ver el detalle."),
     (fig3, "3 · Dónde acierta y dónde falla en test",
-     "De 123 clientes que sí eran mal pagador en el conjunto de prueba, el modelo detectó 45 (recall 37%) y dejó pasar 78 sin alertar. "
+     "De 123 clientes que sí eran mal pagador en el conjunto de prueba, el modelo detectó 45 (recall 37%) con el umbral por defecto de 0.5 y dejó pasar 78 sin alertar. Con el umbral de 0.15, elegido por costo (un moroso aprobado cuesta 10 veces un buen cliente rechazado; supuesto ilustrativo), el recall sube a 46% con precisión de 20%, y es el umbral que usa la API. "
      "De los 7,169 buenos pagadores, marcó 201 como falso riesgo. "
      "Esta es la foto honesta del costo del modelo: prioriza no dejar pasar tantos malos pagadores como sea posible, a cambio de generar falsas alarmas. "
      "<strong>Pasa el mouse</strong> sobre cada celda para ver el valor."),

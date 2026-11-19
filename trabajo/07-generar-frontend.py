@@ -86,7 +86,7 @@ graficas = [
     (fig2, "2 · Qué tan bien discrimina el modelo",
      "AUC=0.814: entre más se aleje la curva azul de la diagonal gris (el azar), mejor separa el modelo ambas clases."),
     (fig3, "3 · Dónde acierta y dónde falla en test",
-     "De 123 mal pagador reales en test, detecta 45 (recall 37%); de 7,169 buenos pagadores, marca 201 como falso riesgo."),
+     "De 123 mal pagador reales en test, detecta 45 (recall 37%) con el umbral por defecto de 0.5; de 7,169 buenos pagadores, marca 201 como falso riesgo. Con el umbral de 0.15, elegido por costo (un moroso aprobado cuesta 10 veces un buen cliente rechazado; supuesto ilustrativo), el recall sube a 46% con precisión de 20%, y es el umbral que usa la API."),
     (fig4, "4 · Qué variables pesan más en la decisión",
      "Edad, ingreso total y antigüedad laboral concentran casi la mitad de la señal predictiva."),
 ]
@@ -106,7 +106,7 @@ for fig, titulo, descripcion in graficas:
 kpis = [
     ("ROC-AUC (test)", f"{auc:.3f}", "Capacidad de separar mal pagador de buen pagador. 0.5=azar, 1.0=perfecto.", AZUL),
     ("Desbalance", f"{(y.mean()*100):.1f}%", "Proporción de mal pagador sobre el total con historial.", ROJO),
-    ("Recall", "36.6%", "De cada 10 malos pagadores reales, detecta ~4.", VERDE),
+    ("Recall (umbral 0.5)", "36.6%", "Con el umbral por defecto detecta ~4 de cada 10 malos pagadores; con el umbral 0.15, elegido por costo, detecta 46%.", VERDE),
     ("Precision", "18.3%", "De cada 10 alertas, ~2 son realmente mal pagador.", NARANJA),
 ]
 kpi_html = "".join(f'''<div class="stat-card" style="--kpi-color:{color}">
