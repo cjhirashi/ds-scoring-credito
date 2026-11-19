@@ -1,0 +1,38 @@
+{
+  "1": {
+    "umbral": 0.68,
+    "recall_test": 0.154,
+    "precision_test": 0.317,
+    "marcados_pct": 0.8,
+    "costo_test": 145,
+    "costo_test_umbral_05": 279,
+    "costo_sin_modelo_aprobar_todos": 123
+  },
+  "5": {
+    "umbral": 0.62,
+    "recall_test": 0.236,
+    "precision_test": 0.252,
+    "marcados_pct": 1.6,
+    "costo_test": 556,
+    "costo_test_umbral_05": 591,
+    "costo_sin_modelo_aprobar_todos": 615
+  },
+  "10": {
+    "umbral": 0.15,
+    "recall_test": 0.463,
+    "precision_test": 0.204,
+    "marcados_pct": 3.8,
+    "costo_test": 882,
+    "costo_test_umbral_05": 981,
+    "costo_sin_modelo_aprobar_todos": 1230
+  },
+  "20": {
+    "umbral": 0.08,
+    "recall_test": 0.488,
+    "precision_test": 0.184,
+    "marcados_pct": 4.5,
+    "costo_test": 1526,
+    "costo_test_umbral_05": 1761,
+    "costo_sin_modelo_aprobar_todos": 2460
+  }
+}

@@ -151,6 +151,21 @@ El resultado en CV y test es consistente, sin señal fuerte de sobreajuste.
 
 ![Matriz de confusión](https://raw.githubusercontent.com/cjhirashi/ds-scoring-credito/main/resultados/fig_03_matriz_confusion.png)
 
+### 🎯 Recall y umbral de decisión
+
+El recall de 0.37 corresponde al umbral por defecto (probabilidad ≥ 0.5), que no está pensado para una clase del 1.7 %. El umbral es una decisión de negocio, no un parámetro del modelo: `trabajo/08-umbral.py` lo elige minimizando un costo (un moroso aprobado cuesta *k* veces lo que un buen cliente rechazado), con predicciones fuera de muestra sobre train, y lo evalúa una sola vez en test. La razón de costos *k* es un supuesto ilustrativo, no un dato del dataset.
+
+| Costo FN:FP | Umbral | Recall (test) | Precisión (test) | Clientes marcados |
+|---|---|---|---|---|
+| 1:1 | 0.68 | 0.15 | 0.32 | 0.8 % |
+| 5:1 | 0.62 | 0.24 | 0.25 | 1.6 % |
+| 10:1 | 0.15 | 0.46 | 0.20 | 3.8 % |
+| 20:1 | 0.08 | 0.49 | 0.18 | 4.5 % |
+
+Con 10:1 el recall sube de 0.37 a 0.46 casi sin perder precisión. Con 1:1 el modelo cuesta más que aprobar a todos (145 contra 123 errores en test): solo se justifica si perder un moroso es mucho más caro que rechazar un buen cliente. La curva de costo es plana entre 0.1 y 0.6, así que el umbral exacto importa menos que haber salido del 0.5 por defecto. PR-AUC en test: 0.152 (azar: 0.017).
+
+![Umbral](https://raw.githubusercontent.com/cjhirashi/ds-scoring-credito/main/resultados/fig_05_umbral.png)
+
 ### 🔹 Variables más importantes
 
 ![Importancia de variables](https://raw.githubusercontent.com/cjhirashi/ds-scoring-credito/main/resultados/fig_04_importancia_variables.png)

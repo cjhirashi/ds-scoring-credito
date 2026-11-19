@@ -10,7 +10,7 @@ from .schemas import SolicitudCredito, ResultadoPrediccion
 
 BASE_DIR = Path(__file__).resolve().parent
 MODELO_PATH = BASE_DIR / "modelo_final.joblib"
-UMBRAL = 0.5
+UMBRAL = 0.15  # minimiza costo con FN:FP = 10:1 (trabajo/08-umbral.py)
 
 app = FastAPI(title="Scoring Crediticio API", version="1.0")
 modelo = joblib.load(MODELO_PATH)
@@ -27,7 +27,7 @@ def predict(solicitud: SolicitudCredito):
     proba = float(modelo.predict_proba(fila)[0, 1])
     es_riesgo = proba >= UMBRAL
     nota = (
-        "El modelo tiene precisión de solo 18% en este umbral: útil como filtro "
+        "El modelo tiene precisión de solo 20% en este umbral: útil como filtro "
         "de revisión manual, no como decisión automática de rechazo."
         if es_riesgo
         else "Sin señales fuertes de riesgo según el modelo."
